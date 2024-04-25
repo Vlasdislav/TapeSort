@@ -5,15 +5,18 @@
 
 class FileTape final : public Tape {
 public:
-    explicit FileTape(const std::string& io_filename) : current_pos_(0) {
+    explicit FileTape(const std::string& io_filename)
+                    : io_filename_(io_filename), current_pos_(0) {
         io_file_.open(io_filename, std::ios::in | std::ios::out);
         if (!io_file_.is_open()) {
-            throw std::ifstream::failure("Неудалось открыть файл `" + io_filename + "`");
+                std::ofstream temp_file(io_filename);
+                temp_file.close();
+                io_file_.open(io_filename, std::ios::in | std::ios::out);
+            // throw std::ifstream::failure("Неудалось открыть файл `" + io_filename + "`");
         }
-        io_file_.clear();
     }
-
-    ~FileTape() override {
+    
+    ~FileTape() {
         io_file_.close();
     }
 
@@ -30,16 +33,10 @@ public:
         return std::nullopt;
     }
 
-    void write(const int32_t num) override {
+    void write(int32_t num) override {
         if (io_file_ << num << ' ') {
             io_file_.flush();
             moveForward();
-        }
-    }
-
-    void write(const std::vector<int32_t>& vec) override {
-        for (auto& num : vec) {
-            write(num);
         }
     }
 
@@ -48,38 +45,30 @@ public:
     }
 
     void moveBackward() override {
-        if (current_pos_ == 0) {
-            throw std::out_of_range("moveBackward: Выход за границы ленты");
-        }
         --current_pos_;
+    }
+
+    size_t getCurrentPos() {
+        return current_pos_;
     }
 
     bool isEnd() override {
         return io_file_.eof();
     }
 
-    bool isEmpty() {
+    bool good() override {
+        return static_cast<bool>(io_file_);
+    }
+
+    bool isEmpty() override {
         return io_file_.peek() == EOF;
     }
 
-    size_t getCurrentPos() override {
-        return current_pos_;
-    }
-
-    bool copy(const std::string& source_filename) override {
-        std::ifstream source_file(source_filename);
-        if (!source_file.is_open()) {
-            std::cerr << "Невозможно открыть файл: `" << source_filename << "`" << std::endl;
-            return false;
-        }
-        if (source_file.peek() != EOF) {
-            io_file_ << source_file.rdbuf();
-            io_file_.flush();
-            source_file.close();
-        }
-        return true;
+    std::string_view getName() {
+        return io_filename_;
     }
 private:
     std::fstream io_file_;
+    std::string io_filename_;
     size_t current_pos_;
 };

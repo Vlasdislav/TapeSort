@@ -7,7 +7,7 @@ namespace opt {
     /// @tparam T 
     /// @param lhs левый операнд - объект, которому присваивается значение
     /// @param rhs_opt правый операнд - объект, значение которого передается для присваивания
-    /// @return bool. Получилось или не получилось присвоить значение
+    /// @return `bool`: Получилось или не получилось присвоить значение
     template<typename T>
     bool assign(T& lhs, const std::optional<T>& rhs_opt) {
         if (rhs_opt.has_value()) {
