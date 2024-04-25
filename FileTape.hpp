@@ -11,7 +11,6 @@ public:
         if (!io_file_.is_open()) {
             throw std::ifstream::failure("Неудалось открыть файл `" + io_filename + "`");
         }
-        io_file_.clear(); // !!!
         current_pos_ = 0;
     }
 
@@ -20,25 +19,27 @@ public:
     }
 
     int32_t read() override {
+        ++current_pos_;
         int32_t num;
         // io_file_.read(reinterpret_cast<char*>(&num), sizeof(int32_t));
         io_file_ >> num;
+        io_file_.flush();
+        io_file_.clear();
         return num;
     }
 
     void write(const int32_t num) override {
+        ++current_pos_;
         // io_file_.write(reinterpret_cast<const char*>(&num), sizeof(int32_t));
         io_file_ << num << ' ';
+        io_file_.flush();
+        io_file_.clear();
     }
 
     void write(const std::vector<int32_t>& vec) {
-        std::cout << "\nwrite: ";
         for (auto& num : vec) {
-            // write(num);
-            io_file_ << num << ' ';
-            std::cout << num << ' ';
+            write(num);
         }
-        std::cout << std::endl;
     }
 
     void moveForward() override {
@@ -47,14 +48,21 @@ public:
         // }
         ++current_pos_;
         io_file_.seekg(current_pos_ * sizeof(int32_t), std::ios::beg);
+        io_file_.seekp(current_pos_ * sizeof(int32_t), std::ios::beg);
     }
 
     void moveBackward() override {
-        if (current_pos_ == 0) {
+        if (current_pos_ < 0) {
             throw std::out_of_range("moveBackward: Выход за границы ленты");
         }
         --current_pos_;
         io_file_.seekg(current_pos_ * sizeof(int32_t), std::ios::beg);
+        io_file_.seekp(current_pos_ * sizeof(int32_t), std::ios::beg);
+    }
+
+    void stablePos() {
+        moveForward();
+        moveBackward();
     }
 
     bool isEnd() override {
@@ -63,6 +71,12 @@ public:
 
     size_t getCurrentPos() override {
         return current_pos_;
+    }
+
+    void resetPos() {
+        current_pos_ = 0;
+        io_file_.seekg(0, std::ios::beg);
+        io_file_.seekp(0, std::ios::beg);
     }
 private:
     std::fstream io_file_;

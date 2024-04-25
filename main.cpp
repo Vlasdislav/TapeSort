@@ -3,29 +3,43 @@
 #include "TepeSort.hpp"
 
 int main() {
-    FileTape input_file(INPUT_FILE_PATH);
-    FileTape output_file(OUTPUT_FILE_PATH);
-    // while (!input_file.isEnd()) {
-    //     output_file.write(input_file.read());
-    // }
-    // TapeSort::sort(input_file, output_file, 2);
-    std::ifstream in("tmp/file_1.txt");
-    std::ofstream out("tmp/file_2.txt");
-    if (in.is_open() && out.is_open()) {
-        std::cout << "Good!\n";
-        out << 1;
-        std::cout << 1;
-        int32_t s;
-        while (in >> s) {
-            std::cout << s << ' ';
-            out << s << ' ';
-        }
-        std::cout << std::endl;
-        in.close();
-        out.close();
-    } else {
-        std::cout << "Bad!\n";
+    FileTape input_file("./files/input.txt");
+    FileTape output_file("./files/output.txt");
+    std::vector<int32_t> aa;
+    while (!input_file.isEnd()) {
+        int32_t a = input_file.read();
+        aa.emplace_back(a);
+        output_file.write(a);
     }
+    std::sort(aa.begin(), aa.end());
+    output_file.write(aa);
+    input_file.resetPos();
+    output_file.resetPos();
+    // std::cout << std::endl;
+    TapeSort::sort(input_file, output_file, 2);
+    // std::ifstream a("tmp/file_1.txt");
+    // std::ifstream b("tmp/file_2.txt");
+    // std::ifstream c("tmp/file_3.txt");
+    // a.clear();
+    // b.clear();
+    // c.clear();
+    // std::ifstream in(INPUT_FILE_PATH/*"tmp/file_1.txt"*/);
+    // std::ofstream out(OUTPUT_FILE_PATH/*"tmp/file_2.txt"*/);
+    // if (in.is_open() && out.is_open()) {
+    //     std::cout << "Good!\n";
+    //     out << 1;
+    //     std::cout << 1;
+    //     int32_t s;
+    //     while (in >> s) {
+    //         std::cout << s << ' ';
+    //         out << s << ' ';
+    //     }
+    //     std::cout << std::endl;
+    //     in.close();
+    //     out.close();
+    // } else {
+    //     std::cout << "Bad!\n";
+    // }
 
     // int a;
     // in >> a;
