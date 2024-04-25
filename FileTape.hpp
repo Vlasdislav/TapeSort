@@ -2,41 +2,47 @@
 
 #include "Tape.hpp"
 #include <fstream>
-#include <vector>
 
 class FileTape final : public Tape {
 public:
-    explicit FileTape(const std::string& io_filename) {
+    explicit FileTape(const std::string& io_filename) : current_pos_(0) {
         io_file_.open(io_filename, std::ios::in | std::ios::out);
         if (!io_file_.is_open()) {
             throw std::ifstream::failure("Неудалось открыть файл `" + io_filename + "`");
         }
-        current_pos_ = 0;
+        io_file_.clear();
     }
 
     ~FileTape() override {
         io_file_.close();
     }
 
-    int32_t read() override {
-        ++current_pos_;
+    std::optional<int32_t> read() override {
+        if (io_file_.peek() == std::ifstream::traits_type::eof()) {
+            return std::nullopt;
+        }
         int32_t num;
-        // io_file_.read(reinterpret_cast<char*>(&num), sizeof(int32_t));
         io_file_ >> num;
-        io_file_.flush();
-        io_file_.clear();
+        moveForward();
+        // setCurrentPos();
+        // io_file_.flush();
+        // io_file_.seekg(current_pos_ * sizeof(int32_t));
+        // io_file_.read(reinterpret_cast<char*>(&num), sizeof(int32_t));
         return num;
     }
 
     void write(const int32_t num) override {
-        ++current_pos_;
+        // io_file_.seekp(current_pos_ * sizeof(int32_t));
         // io_file_.write(reinterpret_cast<const char*>(&num), sizeof(int32_t));
         io_file_ << num << ' ';
         io_file_.flush();
-        io_file_.clear();
+        moveForward();
+        // setCurrentPos();
     }
 
-    void write(const std::vector<int32_t>& vec) {
+    void write(const std::vector<int32_t>& vec) override {
+        // io_file_.seekp(current_pos_ * sizeof(int32_t));
+        // io_file_.write(reinterpret_cast<const char*>(&vec[0]), vec.size() * sizeof(int32_t));
         for (auto& num : vec) {
             write(num);
         }
@@ -47,8 +53,6 @@ public:
         //     throw std::out_of_range("moveForward: Выход за границы ленты");
         // }
         ++current_pos_;
-        io_file_.seekg(current_pos_ * sizeof(int32_t), std::ios::beg);
-        io_file_.seekp(current_pos_ * sizeof(int32_t), std::ios::beg);
     }
 
     void moveBackward() override {
@@ -56,13 +60,6 @@ public:
             throw std::out_of_range("moveBackward: Выход за границы ленты");
         }
         --current_pos_;
-        io_file_.seekg(current_pos_ * sizeof(int32_t), std::ios::beg);
-        io_file_.seekp(current_pos_ * sizeof(int32_t), std::ios::beg);
-    }
-
-    void stablePos() {
-        moveForward();
-        moveBackward();
     }
 
     bool isEnd() override {
@@ -73,10 +70,29 @@ public:
         return current_pos_;
     }
 
-    void resetPos() {
-        current_pos_ = 0;
-        io_file_.seekg(0, std::ios::beg);
-        io_file_.seekp(0, std::ios::beg);
+    void setCurrentPos() {
+        io_file_.clear();
+        io_file_.seekp(current_pos_);
+        // io_file_.seekg(current_pos_);
+    }
+
+    void resetCurrentPos() {
+        io_file_.clear();
+        io_file_.seekp(0);
+        // io_file_.seekg(0);
+    }
+
+    bool copy(const std::string& source_filename) override {
+        std::cout << source_filename << std::endl;
+        std::ifstream source_file(source_filename);
+        if (!source_file.is_open()) {
+            std::cerr << "Невозможно открыть файл: `" << source_filename << "`" << std::endl;
+            return false;
+        }
+        io_file_ << source_file.rdbuf();
+        io_file_.flush();
+        source_file.close();
+        return true;
     }
 private:
     std::fstream io_file_;

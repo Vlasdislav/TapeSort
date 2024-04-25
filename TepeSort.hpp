@@ -2,6 +2,7 @@
 
 #include "Tape.hpp"
 #include "FileTape.hpp"
+#include "settings.hpp"
 #include <algorithm>
 #include <vector>
 #include <queue>
@@ -18,11 +19,10 @@ public:
         size_t tmp_cur_pos = 0;
         std::vector<int32_t> buffer(memory_limit);
         std::queue<std::string> queue;
-        // reinterpret_cast<FileTape&>(input_tape).resetPos(); // !!!
         while (!input_tape.isEnd()) {
             size_t fullness_buff = 0;
             while (!input_tape.isEnd() && fullness_buff < memory_limit) {
-                buffer[fullness_buff] = input_tape.read();
+                opt::assign(buffer[fullness_buff], input_tape.read());
                 ++fullness_buff;
             }
             std::sort(buffer.begin(), buffer.begin() + fullness_buff);
@@ -45,6 +45,8 @@ public:
         }
         std::string result = queue.front();
         queue.pop();
+        // TODO: copy data to `output.txt`
+        input_tape.copy(result);
     }
 
     static void mergeTwoFiles(const std::string& lhs_filename,
@@ -53,31 +55,40 @@ public:
         FileTape tmp_file_tape_lhs(lhs_filename);
         FileTape tmp_file_tape_rhs(rhs_filename);
         FileTape tmp_file_tape_merged(next_filename);
-        // tmp_file_tape_lhs.resetPos();
-        // tmp_file_tape_rhs.resetPos();
-        // tmp_file_tape_merged.resetPos();
+        bool is_prepared_read_lhs = true;
+        bool is_prepared_read_rhs = true;
         while (!tmp_file_tape_lhs.isEnd() && !tmp_file_tape_rhs.isEnd()) {
-            int32_t current_element_lhs = tmp_file_tape_lhs.read();
-            int32_t current_element_rhs = tmp_file_tape_rhs.read();
+            int32_t current_element_lhs;
+            int32_t current_element_rhs;
+            if (is_prepared_read_lhs) {
+                opt::assign(current_element_lhs, tmp_file_tape_lhs.read());
+                is_prepared_read_lhs = false;
+            }
+            if (is_prepared_read_rhs) {
+                opt::assign(current_element_rhs, tmp_file_tape_rhs.read());
+                is_prepared_read_rhs = false;
+            }
             if (current_element_lhs < current_element_rhs) {
                 tmp_file_tape_merged.write(current_element_lhs);
+                is_prepared_read_lhs = true;
                 // tmp_file_tape_rhs.moveBackward();
             } else {
                 tmp_file_tape_merged.write(current_element_rhs);
+                is_prepared_read_rhs = true;
                 // tmp_file_tape_lhs.moveBackward();
             }
-            // tmp_file_tape_lhs.stablePos();
-            // tmp_file_tape_rhs.stablePos();
         }
         while (!tmp_file_tape_lhs.isEnd()) {
-            int32_t current_element_lhs = tmp_file_tape_lhs.read();
-            tmp_file_tape_merged.write(current_element_lhs);
-            // tmp_file_tape_lhs.stablePos();
+            int32_t current_element_lhs;
+            if (opt::assign(current_element_lhs, tmp_file_tape_lhs.read())) {
+                tmp_file_tape_merged.write(current_element_lhs);
+            }
         }
         while (!tmp_file_tape_rhs.isEnd()) {
-            int32_t current_element_rhs = tmp_file_tape_rhs.read();
-            tmp_file_tape_merged.write(current_element_rhs);
-            // tmp_file_tape_rhs.stablePos();
+            int32_t current_element_rhs;
+            if (opt::assign(current_element_rhs, tmp_file_tape_rhs.read())) {
+                tmp_file_tape_merged.write(current_element_rhs);
+            }
         }
     }
 };
