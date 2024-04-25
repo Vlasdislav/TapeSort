@@ -19,9 +19,10 @@ public:
         size_t tmp_cur_pos = 0;
         std::vector<int32_t> buffer(memory_limit);
         std::queue<std::string> queue;
-        while (!input_tape.isEnd()) {
+        while (!input_tape.isEmpty() && !input_tape.isEnd()) {
             size_t fullness_buff = 0;
-            while (!input_tape.isEnd() && fullness_buff < memory_limit) {
+            while (!input_tape.isEmpty() && !input_tape.isEnd() &&
+                    fullness_buff < memory_limit) {
                 opt::assign(buffer[fullness_buff], input_tape.read());
                 ++fullness_buff;
             }
@@ -40,13 +41,14 @@ public:
                 tmp_cur_pos = (tmp_cur_pos + 1) % 3;
                 mergeTwoFiles(lhs_filename, rhs_filename, next_filename);
                 queue.emplace(next_filename);
-                std::cout << next_filename << std::endl;
             }
         }
-        std::string result = queue.front();
-        queue.pop();
-        // TODO: copy data to `output.txt`
-        input_tape.copy(result);
+        if (!queue.empty()) {
+            std::string result = queue.front();
+            queue.pop();
+            output_tape.copy(result);
+            std::cout << result << std::endl;
+        }
     }
 
     static void mergeTwoFiles(const std::string& lhs_filename,
@@ -57,7 +59,8 @@ public:
         FileTape tmp_file_tape_merged(next_filename);
         bool is_prepared_read_lhs = true;
         bool is_prepared_read_rhs = true;
-        while (!tmp_file_tape_lhs.isEnd() && !tmp_file_tape_rhs.isEnd()) {
+        while (!tmp_file_tape_lhs.isEmpty() && !tmp_file_tape_lhs.isEnd() &&
+                !tmp_file_tape_rhs.isEmpty() && !tmp_file_tape_rhs.isEnd()) {
             int32_t current_element_lhs;
             int32_t current_element_rhs;
             if (is_prepared_read_lhs) {
@@ -71,20 +74,18 @@ public:
             if (current_element_lhs < current_element_rhs) {
                 tmp_file_tape_merged.write(current_element_lhs);
                 is_prepared_read_lhs = true;
-                // tmp_file_tape_rhs.moveBackward();
             } else {
                 tmp_file_tape_merged.write(current_element_rhs);
                 is_prepared_read_rhs = true;
-                // tmp_file_tape_lhs.moveBackward();
             }
         }
-        while (!tmp_file_tape_lhs.isEnd()) {
+        while (!tmp_file_tape_lhs.isEmpty() && !tmp_file_tape_lhs.isEnd()) {
             int32_t current_element_lhs;
             if (opt::assign(current_element_lhs, tmp_file_tape_lhs.read())) {
                 tmp_file_tape_merged.write(current_element_lhs);
             }
         }
-        while (!tmp_file_tape_rhs.isEnd()) {
+        while (!tmp_file_tape_rhs.isEmpty() && !tmp_file_tape_rhs.isEnd()) {
             int32_t current_element_rhs;
             if (opt::assign(current_element_rhs, tmp_file_tape_rhs.read())) {
                 tmp_file_tape_merged.write(current_element_rhs);
