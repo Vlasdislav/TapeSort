@@ -1,28 +1,23 @@
 #include <iostream>
 #include "TapeSort.hpp"
-#include "config/ConfigReader.hpp"
+#include "config/config_map/ConfigMap.hpp"
 
 int main(int argc, char** argv) {
     if (argc != 3) {
         std::cerr << "Ожидалось: ./TATLIN <INPUT_FILENAME> <OUTPUT_FILENAME>" << std::endl;
         return 1;
     }
-
-    ConfigReader config("./config/config.txt");
-    int readDelay = config.getDelay("read_delay");
-    int writeDelay = config.getDelay("write_delay");
-    int rewindDelay = config.getDelay("rewind_delay");
-    int shiftDelay = config.getDelay("shift_delay");
-    std::cout << "Read Delay: " << readDelay << "ms\n";
-    std::cout << "Write Delay: " << writeDelay << "ms\n";
-    std::cout << "Rewind Delay: " << rewindDelay << "ms\n";
-    std::cout << "Shift Delay: " << shiftDelay << "ms\n";
+    // Создание объекта для заполнения статического мепа кофигураций
+    ConfigMap{};
+    for (auto& [l, r] : ConfigMap::configMap) {
+        std::cout << l << ' ' << r << std::endl;
+    }
 
     std::string input_filename = argv[1];
     std::string output_filename = argv[2];
     FileTape input_tape(input_filename);
     FileTape output_tape(output_filename);
-    int M;
+    size_t M;
     std::cout << "Укажите сколько байт оперaтивной памяти можно использовать: ";
     std::cin >> M;
 
