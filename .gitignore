@@ -18,6 +18,7 @@ cmake_files
 *.exe
 *.out
 TATLIN
+main
 
 # Игнорировать файлы с настройками пользователя
 *.iml

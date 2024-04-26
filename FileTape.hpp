@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Tape.hpp"
+#include "config/config_map/ConfigMap.hpp"
 #include <fstream>
 
 class FileTape final : public Tape {
@@ -25,6 +26,7 @@ public:
             return std::nullopt;
         }
         int32_t num;
+        ConfigMap::getConfigMap()["read_delay"]();
         if (io_file_ >> num) {
             io_file_.flush();
             moveForward();
@@ -34,6 +36,7 @@ public:
     }
 
     void write(int32_t num) override {
+        ConfigMap::getConfigMap()["write_delay"]();
         if (io_file_ << num << ' ') {
             io_file_.flush();
             moveForward();
@@ -41,10 +44,12 @@ public:
     }
 
     void moveForward() override {
+        ConfigMap::getConfigMap()["shift_delay"]();
         ++current_pos_;
     }
 
     void moveBackward() override {
+        ConfigMap::getConfigMap()["rewind_delay"]();
         --current_pos_;
     }
 

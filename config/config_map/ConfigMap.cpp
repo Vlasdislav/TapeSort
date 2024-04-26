@@ -1,7 +1,8 @@
 #include "ConfigMap.hpp"
+#include "../../settings.hpp"
 #include <vector>
-
-std::unordered_map<std::string, int> ConfigMap::configMap;
+#include <chrono>
+#include <thread>
 
 ConfigMap::ConfigMap() {
     std::vector<std::string> setting_names = {
@@ -11,7 +12,17 @@ ConfigMap::ConfigMap() {
         "shift_delay"
     };
     ConfigReader config("../config/config.txt");
-    for (auto& name : setting_names) {
-        configMap[name] = config.getDelay(name);
+    for (const auto& name : setting_names) {
+        getConfigMap()[name] = [config, name]() mutable {
+            int time = config.getDelay(name);
+            std::chrono::milliseconds delay(time);
+            std::this_thread::sleep_for(delay);
+            return time;
+        };
     }
+}
+
+std::unordered_map<std::string, delayFunc>& ConfigMap::getConfigMap() {
+    static std::unordered_map<std::string, delayFunc> configMap;
+    return configMap;
 }

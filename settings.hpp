@@ -1,6 +1,9 @@
 #pragma once
 
 #include <optional>
+#include <functional>
+
+using delayFunc = std::function<int()>;
 
 namespace opt {
     /// @brief Функция присвоения значения из типа `std::optional<T>` в переменную типа `T`

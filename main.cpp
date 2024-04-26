@@ -9,9 +9,6 @@ int main(int argc, char** argv) {
     }
     // Создание объекта для заполнения статического мепа кофигураций
     ConfigMap{};
-    for (auto& [l, r] : ConfigMap::configMap) {
-        std::cout << l << ' ' << r << std::endl;
-    }
 
     std::string input_filename = argv[1];
     std::string output_filename = argv[2];
