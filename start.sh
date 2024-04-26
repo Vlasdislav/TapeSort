@@ -1,1 +1,1 @@
-make && ./TATLIN
+make && ./TATLIN ./files/input.txt ./files/output.txt

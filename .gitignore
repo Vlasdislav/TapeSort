@@ -32,5 +32,5 @@ TATLIN
 .vs/
 .vscode/
 
-# bash
+# Игнорировать файлы bash
 *.sh
