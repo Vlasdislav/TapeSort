@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Tape.hpp"
-#include "config/config_map/ConfigMap.hpp"
+#include "../config/config_map/ConfigMap.hpp"
 #include <fstream>
 
 class FileTape final : public Tape {
@@ -10,10 +10,12 @@ public:
                     : io_filename_(io_filename), current_pos_(0) {
         io_file_.open(io_filename, std::ios::in | std::ios::out);
         if (!io_file_.is_open()) {
-                std::ofstream temp_file(io_filename);
-                temp_file.close();
-                io_file_.open(io_filename, std::ios::in | std::ios::out);
-            // throw std::ifstream::failure("Неудалось открыть файл `" + io_filename + "`");
+            std::ofstream temp_file(io_filename);
+            temp_file.close();
+            io_file_.open(io_filename, std::ios::in | std::ios::out);
+            if (!io_file_.is_open()) {
+                throw std::ifstream::failure("Неудалось открыть файл `" + io_filename + "`");
+            }
         }
     }
     

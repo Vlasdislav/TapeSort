@@ -20,3 +20,19 @@ namespace opt {
         return false;
     }
 };
+
+namespace valid {
+    inline void guardInputData(const int& argc) {
+        if (argc != 3) {
+            std::cerr << "Ожидалось: ./TATLIN <INPUT_FILENAME> <OUTPUT_FILENAME>" << std::endl;
+            exit(1);
+        }
+    }
+
+    inline void guardConsoleInputData(size_t& M) {
+        do {
+            std::cout << "Укажите сколько байт оперaтивной памяти можно использовать (минимум 4): ";
+            std::cin >> M;
+        } while (M < 4);
+    }
+};

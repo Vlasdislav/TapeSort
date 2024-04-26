@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FileTape.hpp"
+#include "Tape/FileTape.hpp"
 #include "settings.hpp"
 #include <string>
 #include <algorithm>
@@ -8,6 +8,8 @@
 class TapeSort {
 public:
     static void sort(Tape& input_tape, Tape& output_tape, const size_t& buffer_size) {
+        system("rm -r tmp");
+        system("mkdir tmp");
         std::vector<int> buffer(buffer_size);
         int chunk_num = 0;
         while (!input_tape.isEmpty() && !input_tape.isEnd()) {
@@ -16,23 +18,24 @@ public:
                 opt::assign(buffer[i], input_tape.read());
             }
             std::sort(buffer.begin(), buffer.begin() + i);
-            std::string chunk_filename = "chunk_" + std::to_string(chunk_num++) + ".txt";
+            std::string chunk_filename = "tmp/chunk_" + std::to_string(chunk_num++) + ".txt";
             FileTape chunk(chunk_filename);
             for (size_t j = 0; j < i; ++j) {
                 chunk.write(buffer[j]);
             }
         }
         while (chunk_num > 1) {
-            std::string chunk_filename_1 = "chunk_" + std::to_string(chunk_num - 2) + ".txt";
-            std::string chunk_filename_2 = "chunk_" + std::to_string(chunk_num - 1) + ".txt";
-            std::string temp_filename = "temp_chunk.txt";
+            std::string chunk_filename_1 = "tmp/chunk_" + std::to_string(chunk_num - 2) + ".txt";
+            std::string chunk_filename_2 = "tmp/chunk_" + std::to_string(chunk_num - 1) + ".txt";
+            std::string temp_filename = "tmp/temp_chunk.txt";
             mergeTwoFiles(chunk_filename_1, chunk_filename_2, temp_filename);
             remove(chunk_filename_1.data());
             remove(chunk_filename_2.data());
-            rename(temp_filename.data(), ("chunk_" + std::to_string(chunk_num - 2) + ".txt").data());
+            rename(temp_filename.data(), ("tmp/chunk_" + std::to_string(chunk_num - 2) + ".txt").data());
             --chunk_num;
         }
-        rename("chunk_0.txt", output_tape.getName().data());
+        rename("tmp/chunk_0.txt", output_tape.getName().data());
+        system("rm -r tmp");
     }
 
     static void mergeTwoFiles(const std::string& lhs_filename,

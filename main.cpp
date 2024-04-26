@@ -1,22 +1,21 @@
 #include <iostream>
 #include "TapeSort.hpp"
 #include "config/config_map/ConfigMap.hpp"
+#include "settings.hpp"
 
 int main(int argc, char** argv) {
-    if (argc != 3) {
-        std::cerr << "Ожидалось: ./TATLIN <INPUT_FILENAME> <OUTPUT_FILENAME>" << std::endl;
-        return 1;
-    }
-    // Создание объекта для заполнения статического мепа кофигураций
-    ConfigMap{};
+    valid::guardInputData(argc);
 
     std::string input_filename = argv[1];
     std::string output_filename = argv[2];
     FileTape input_tape(input_filename);
     FileTape output_tape(output_filename);
+
     size_t M;
-    std::cout << "Укажите сколько байт оперaтивной памяти можно использовать: ";
-    std::cin >> M;
+    valid::guardConsoleInputData(M);
+
+    // Создание объекта для заполнения статического мепа кофигураций
+    ConfigMap{};
 
     TapeSort::sort(input_tape, output_tape, M / sizeof(int32_t));
 }

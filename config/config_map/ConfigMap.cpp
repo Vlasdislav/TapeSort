@@ -11,7 +11,7 @@ ConfigMap::ConfigMap() {
         "rewind_delay",
         "shift_delay"
     };
-    ConfigReader config("../config/config.txt");
+    ConfigReader config(CONFIG_FILE_PATH);
     for (const auto& name : setting_names) {
         getConfigMap()[name] = [config, name]() mutable {
             int time = config.getDelay(name);
