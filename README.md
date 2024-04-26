@@ -5,8 +5,9 @@ bash build.sh
 ```
 
 ## Запуск
+И bash скрипт для запуска
 ```bash
-./TATLIN <INPUT_FILENAME> <OUTPUT_FILENAME>
+bash start.sh <INPUT_FILENAME> <OUTPUT_FILENAME>
 ```
 
 ## Пример изменяймого файла конфигураций

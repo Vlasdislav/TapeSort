@@ -8,7 +8,6 @@
 class TapeSort {
 public:
     static void sort(Tape& input_tape, Tape& output_tape, const size_t& buffer_size) {
-        system("rm -r tmp");
         system("mkdir tmp");
         std::vector<int> buffer(buffer_size);
         int chunk_num = 0;
