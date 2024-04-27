@@ -1,6 +1,6 @@
 #include <iostream>
 #include "TapeSort.hpp"
-#include "config/config_map/ConfigMap.hpp"
+#include "ConfigMap.hpp"
 #include "settings.hpp"
 
 int main(int argc, char** argv) {

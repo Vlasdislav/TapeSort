@@ -33,3 +33,7 @@ main
 # Игнорировать файлы сборки Visual Studio
 .vs/
 .vscode/
+
+# Прочее
+in.txt
+out.txt
