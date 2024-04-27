@@ -4,5 +4,5 @@ cd ./cmake_files
 make
 mkdir files
 ./smoke_test
-# rm -r files
+rm -r files
 cd ../
