@@ -4,6 +4,7 @@
 #include <functional>
 
 using delayFunc = std::function<int()>;
+using configMap = std::unordered_map<std::string, delayFunc>;
 
 namespace opt {
     /// @brief Функция присвоения значения из типа `std::optional<T>` в переменную типа `T`

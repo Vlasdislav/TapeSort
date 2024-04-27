@@ -11,9 +11,9 @@ public:
         system("mkdir tmp");
         std::vector<int> buffer(buffer_size);
         int chunk_num = 0;
-        while (!input_tape.isEmpty() && !input_tape.isEnd()) {
+        while (!input_tape.isEnd()) {
             size_t i = 0;
-            for (; i < buffer_size && !input_tape.isEmpty() && !input_tape.isEnd(); ++i) {
+            for (; i < buffer_size && !input_tape.isEnd(); ++i) {
                 opt::assign(buffer[i], input_tape.read());
             }
             std::sort(buffer.begin(), buffer.begin() + i);
@@ -44,25 +44,26 @@ public:
         FileTape rhs_tape(rhs_filename);
         FileTape output_tape(output_filename);
         int32_t num_1;
-        opt::assign(num_1, lhs_tape.read());
         int32_t num_2;
-        opt::assign(num_2, rhs_tape.read());
-        while (lhs_tape.good() && rhs_tape.good()) {
-            if (num_1 < num_2) {
+        if (opt::assign(num_1, lhs_tape.read()) &&
+            opt::assign(num_2, rhs_tape.read())) {
+            while (lhs_tape.good() && rhs_tape.good()) {
+                if (num_1 < num_2) {
+                    output_tape.write(num_1);
+                    opt::assign(num_1, lhs_tape.read());
+                } else {
+                    output_tape.write(num_2);
+                    opt::assign(num_2, rhs_tape.read());
+                }
+            }
+            while (lhs_tape.good()) {
                 output_tape.write(num_1);
                 opt::assign(num_1, lhs_tape.read());
-            } else {
+            }
+            while (rhs_tape.good()) {
                 output_tape.write(num_2);
                 opt::assign(num_2, rhs_tape.read());
             }
-        }
-        while (lhs_tape.good()) {
-            output_tape.write(num_1);
-            opt::assign(num_1, lhs_tape.read());
-        }
-        while (rhs_tape.good()) {
-            output_tape.write(num_2);
-            opt::assign(num_2, rhs_tape.read());
         }
     }
 };

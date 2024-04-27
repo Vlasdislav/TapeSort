@@ -16,6 +16,5 @@ public:
     virtual bool isEnd() = 0;
     virtual size_t getCurrentPos() = 0;
     virtual bool good() = 0;
-    virtual bool isEmpty() = 0;
     virtual std::string_view getName() = 0;
 };

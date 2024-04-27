@@ -9,5 +9,6 @@ input_file="../$1"
 output_file="../$2"
 
 cd ./cmake_files
+make
 ./TATLIN $input_file $output_file
 cd ../

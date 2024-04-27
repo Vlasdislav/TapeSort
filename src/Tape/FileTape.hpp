@@ -24,7 +24,7 @@ public:
     }
 
     std::optional<int32_t> read() override {
-        if (isEmpty() || isEnd()) {
+        if (isEnd()) {
             return std::nullopt;
         }
         int32_t num;
@@ -39,7 +39,7 @@ public:
 
     void write(const int32_t& num) override {
         ConfigMap::getConfigMap()["write_delay"]();
-        if (io_file_ << num << ' ') {
+        if (io_file_ << (current_pos_ == 0 ? "" : " ") << num) {
             io_file_.flush();
             moveForward();
         }
@@ -48,15 +48,11 @@ public:
     void moveForward() override {
         ConfigMap::getConfigMap()["shift_delay"]();
         ++current_pos_;
-        // io_file_.seekg(current_pos_ * sizeof(int32_t));
-        // io_file_.seekp(current_pos_ * sizeof(int32_t));
     }
 
     void moveBackward() override {
         ConfigMap::getConfigMap()["rewind_delay"]();
         --current_pos_;
-        // io_file_.seekg(current_pos_ * sizeof(int32_t));
-        // io_file_.seekp(current_pos_ * sizeof(int32_t));
     }
 
     size_t getCurrentPos() override {
@@ -64,15 +60,11 @@ public:
     }
 
     bool isEnd() override {
-        return io_file_.eof();
+        return io_file_.peek() == EOF;
     }
 
     bool good() override {
         return static_cast<bool>(io_file_);
-    }
-
-    bool isEmpty() override {
-        return io_file_.peek() == EOF;
     }
 
     std::string_view getName() override {
