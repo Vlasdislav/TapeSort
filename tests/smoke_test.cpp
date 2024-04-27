@@ -23,6 +23,7 @@ TEST(FileTape, Constructor) {
     }
     std::string ft_name = "files/ctr.txt";
     FileTape ft(ft_name);
+    EXPECT_TRUE(ft.isEnd());
     EXPECT_EQ(ft.getName(), ft_name);
     EXPECT_EQ(ft.getCurrentPos(), 0);
 }

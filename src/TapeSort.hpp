@@ -47,7 +47,7 @@ public:
         int32_t num_2;
         if (opt::assign(num_1, lhs_tape.read()) &&
             opt::assign(num_2, rhs_tape.read())) {
-            while (lhs_tape.good() && rhs_tape.good()) {
+            while (!lhs_tape.isEnd() && !rhs_tape.isEnd()) {
                 if (num_1 < num_2) {
                     output_tape.write(num_1);
                     opt::assign(num_1, lhs_tape.read());
@@ -56,11 +56,11 @@ public:
                     opt::assign(num_2, rhs_tape.read());
                 }
             }
-            while (lhs_tape.good()) {
+            while (!lhs_tape.isEnd()) {
                 output_tape.write(num_1);
                 opt::assign(num_1, lhs_tape.read());
             }
-            while (rhs_tape.good()) {
+            while (!rhs_tape.isEnd()) {
                 output_tape.write(num_2);
                 opt::assign(num_2, rhs_tape.read());
             }

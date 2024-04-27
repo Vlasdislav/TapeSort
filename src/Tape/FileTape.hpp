@@ -60,11 +60,7 @@ public:
     }
 
     bool isEnd() override {
-        return io_file_.peek() == EOF;
-    }
-
-    bool good() override {
-        return static_cast<bool>(io_file_);
+        return io_file_.peek() == EOF || io_file_.eof();
     }
 
     std::string_view getName() override {
